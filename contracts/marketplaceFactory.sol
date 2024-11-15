@@ -1,41 +1,32 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity 0.8.27;
-import "./MarketPlaace.sol";
 
+import "./MarketPlaace.sol"; 
 
-contract MarketPlaceFactory   {
+contract MarketPlaceFactory {
+    address public owner;
+    MarketPlace[] public marketplaces;
 
-     MarketPlace[] public deployedMarketPlace;
-    mapping(address => uint256) public marketplaceToIndex;
-        
+    event MarketPlaceCreated(address indexed marketplaceAddress, address indexed creator);
 
-
-     function deployProposalVote() external returns (address ) {
-        MarketPlace newMarketPlace = new MarketPlace();
-        uint256 index = deployedMarketPlace.length;
-        deployedMarketPlace.push(newMarketPlace);
-        marketplaceToIndex[address (newMarketPlace)] = index;
-          return address(newMarketPlace);
-
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
+        _;
     }
-   
-
-    function createlistItem(address MarketPlaceAddress,string memory _name, uint16 _price) external  {
-    
-        // require(ItemAddress != address(0), "Invalid contract address");
-        // require(isMarketplaceContract(ItemAddress), "Contract not found");
-        
-        // MarketPlace marketPlace = MarketPlace(MarketPlaceAddress);
-        // marketPlace.createlistItem(_name, _price);
-        
-    }
-
-    
-
-
 
     constructor() {
-        
+        owner = msg.sender;
+    }
+
+    function createMarketPlace() external returns (address) {
+        MarketPlace newMarketPlace = new MarketPlace();
+        marketplaces.push(newMarketPlace);
+
+        emit MarketPlaceCreated(address(newMarketPlace), msg.sender);
+        return address(newMarketPlace);
+    }
+
+    function getMarketPlaces() external view returns (MarketPlace[] memory) {
+        return marketplaces;
     }
 }
-
